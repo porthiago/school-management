@@ -1,8 +1,13 @@
 require('dotenv').config();
 const express = require('express');
+const studentsRoutes = require('./routes/studentsRoutes');
+
 const app = express();
 
+app.use(express.json());
 
-app.listen(3000, () => {
+app.use('/aluno', studentsRoutes);
+
+app.listen(process.env.PORT || 3000, () => {
   console.log('Server listening on port 3000!');
-})
+});
