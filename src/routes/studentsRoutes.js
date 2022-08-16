@@ -8,5 +8,6 @@ router.use(verifyToken);
 
 router.get('/', students.index);
 router.post('/', students.create);
+router.put('/:id', students.update);
 
 module.exports = router;

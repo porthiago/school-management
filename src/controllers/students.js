@@ -93,7 +93,6 @@ const index = async (req, res) => {
       if (students.length === 0) {
         return res.status(404).json({ message: 'Nenhum aluno encontrado' });
       }
-      console.log(id);
 
       if (id) {
         const students = await knex('alunos')
@@ -140,7 +139,34 @@ const create = async (req, res) => {
   }
 };
 
+const update = async (req, res) => {
+  const { nome, situacao, observacao, serie, turma, modalidade } = req.body;
+  const { id } = req.params;
+  try {
+    await studentsSchema.validate(req.body);
+
+    const studentData = await knex('alunos')
+      .where('id', id)
+      .update({ nome, situacao, observacao, serie, turma, modalidade })
+      .returning('*');
+
+    if (studentData.length === 0) {
+      return res.status(400).json({
+        message: 'Ocorreu um erro ao atualizar o aluno no banco de dados.'
+      });
+    }
+
+    return res.json({
+      messagem: 'Aluno Atualizado com Sucesso.',
+      aluno: studentData[0]
+    });
+  } catch (error) {
+    return res.status(500).json({ messagem: error.message });
+  }
+};
+
 module.exports = {
   index,
-  create
+  create,
+  update
 };
