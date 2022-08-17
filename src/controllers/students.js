@@ -3,7 +3,7 @@ const knex = require('../config/connection');
 const { studentsSchema } = require('../validations/studentsSchema');
 
 const index = async (req, res) => {
-  const { serie, situacao, modalidade, nome, id } = req.query;
+  let { serie, situacao, modalidade, nome, id, turma } = req.query;
 
   try {
     if (serie) {
@@ -17,6 +17,42 @@ const index = async (req, res) => {
         return res.status(404).json({ message: 'Nenhum aluno encontrado' });
       }
 
+      if (turma) {
+        const students = await knex('alunos')
+          .where('serie', serie)
+          .whereILike('turma', turma)
+          .select('*')
+          .orderBy('serie')
+          .orderBy('nome');
+
+        if (students.length === 0) {
+          return res.status(404).json({ message: 'Nenhum aluno encontrado' });
+        }
+
+        if (situacao) {
+          const currentStudents = [];
+
+          for (const student of students) {
+            if (student.situacao.toUpperCase() === situacao.toUpperCase()) {
+              currentStudents.push(student);
+            }
+          }
+
+          if (currentStudents.length === 0) {
+            return res
+              .status(404)
+              .json({ messagem: 'Nenhum aluno encontrado' });
+          }
+
+          return res.json({
+            alunos: currentStudents,
+            total: currentStudents.length
+          });
+        }
+
+        return res.json({ alunos: students, total: students.length });
+      }
+
       if (situacao) {
         const students = await knex('alunos')
           .where('serie', serie)
@@ -25,7 +61,7 @@ const index = async (req, res) => {
           .orderBy('nome');
 
         if (students.length === 0) {
-          return res.status(404).json({ message: 'Nenhum aluno encontrado' });
+          return res.status(404).json({ messagem: 'Nenhum aluno encontrado' });
         }
 
         return res.json({ alunos: students, total: students.length });
@@ -110,7 +146,7 @@ const index = async (req, res) => {
 
     return res.json({ alunos: students, total: students.length });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ messagem: error.message });
   }
 };
 
