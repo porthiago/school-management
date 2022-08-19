@@ -187,12 +187,14 @@ const update = async (req, res) => {
       return res.status(404).json({ message: 'Aluno não encontrado' });
     }
 
-    const students = await knex('alunos')
+    const students = await knex('alunos');
 
-    if (nome !== student[0].nome) { 
+    if (nome !== student[0].nome) {
       for (const student of students) {
         if (student.nome === nome) {
-          return res.status(400).json({ message: 'Aluno já cadastrado' });
+          return res
+            .status(400)
+            .json({ message: `Aluno já cadastrado para o id ${student.id}.` });
         }
       }
     }
