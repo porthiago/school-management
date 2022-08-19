@@ -181,6 +181,22 @@ const update = async (req, res) => {
   try {
     await studentsSchema.validate(req.body);
 
+    const student = await knex('alunos').where('id', id);
+
+    if (student.length === 0) {
+      return res.status(404).json({ message: 'Aluno não encontrado' });
+    }
+
+    const students = await knex('alunos')
+
+    if (nome !== student[0].nome) { 
+      for (const student of students) {
+        if (student.nome === nome) {
+          return res.status(400).json({ message: 'Aluno já cadastrado' });
+        }
+      }
+    }
+
     const studentData = await knex('alunos')
       .where('id', id)
       .update({ nome, situacao, observacao, serie, turma, modalidade })
