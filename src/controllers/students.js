@@ -114,6 +114,7 @@ const index = async (req, res) => {
     const students = await knex('alunos')
       .select('*')
       .orderBy('serie')
+      .orderBy('turma')
       .orderBy('nome');
 
     if (students.length === 0) {
